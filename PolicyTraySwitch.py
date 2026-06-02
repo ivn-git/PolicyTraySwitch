@@ -645,7 +645,7 @@ class VPNTrayApp:
         switch_menu = pystray.Menu(*switch_items)
         
         # Создаем основные пункты меню
-        toggle_item = pystray.MenuItem("🔄 Подкл/откл к политике", self.on_toggle_action, default=True)
+        toggle_item = pystray.MenuItem("🔄 Подкл/откл к политике", self.on_toggle_action, default=True, visible=False)
         switches_item = pystray.MenuItem("📋 Выбрать политику", switch_menu)        
         autorun_item = pystray.MenuItem(
             "🚀 Запускать при старте Windows",
