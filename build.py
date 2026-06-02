@@ -236,7 +236,21 @@ if __name__ == "__main__":
     if script_dir not in sys.path:
         sys.path.insert(0, script_dir)
 
-    print("=== НАЧАЛО АВТОМАТИЧЕСКОЙ СБОРКИ ПРОЕКТА ===")
+    # === АВТОМАТИЧЕСКАЯ СИНХРОНИЗАЦИЯ ВЕРСИИ ===
+    # 1. Проверяем, передан ли аргумент через консоль (например: python build.py 1.0.1)
+    if len(sys.argv) > 1:
+        APP_VERSION = sys.argv[1]
+        print(f"[ INFO ] Версия успешно перезаписана из аргументов командной строки: {APP_VERSION}")
+    
+    # 2. Если аргументов нет, но мы в GitHub Actions — берем версию из тега напрямую
+    elif os.environ.get('GITHUB_ACTIONS') == 'true':
+        github_ref = os.environ.get('GITHUB_REF_NAME', '')  # Содержит имя тега, например 'v1.0.1'
+        if github_ref:
+            # Отрезаем букву 'v' в начале, если она есть
+            APP_VERSION = github_ref.lstrip('vV')
+            print(f"[ INFO ] Версия успешно импортирована из тега GitHub: {APP_VERSION}")
+
+    print(f"=== НАЧАЛО АВТОМАТИЧЕСКОЙ СБОРКИ ПРОЕКТА (Версия: {APP_VERSION}) ===")
 
     # Шаг 0: Скачивание, проверка зависимостей и фикс путей
     check_and_install_dependencies()
