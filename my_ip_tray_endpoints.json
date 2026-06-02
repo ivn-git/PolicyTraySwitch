@@ -1,0 +1,30 @@
+{
+  "endpoints": [
+    {
+      "url": "https://free.freeipapi.com/api/json/",
+      "ip_key": "ipAddress",
+      "code_key": "countryCode",
+      "country_key": "countryName",
+      "region_key": "regionName",
+      "fmt_string": "IP: {ipAddress}\nСтрана: {countryName}\nГород: {cityName}\nasnOrganization: {asnOrganization}\n\nIP инфо провайдер: freeipapi.com"
+    },
+    {
+      "url": "http://ip-api.com/json/",
+      "ip_key": "query",
+      "code_key": "countryCode",
+      "country_key": "country",
+      "region_key": "regionName",
+      "fmt_string": "IP: {query}\nСтрана: {country}\nРегион: {regionName}\nISP: {isp}\norg: {org}\n\nIP инфо провайдер: ip-api.com"
+    }
+  ],
+  "flag_providers": [
+    {
+      "name": "GoSquared flagsapi.com",
+      "url_template": "https://flagsapi.com/{code_upper}/flat/24.png"
+    },
+    {
+      "name": "Flagpedia.net",
+      "url_template": "https://flagcdn.com/{code_lower}.png"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+requests
+WMI
+Pillow
+pystray
+pyinstaller
