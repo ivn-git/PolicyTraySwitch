@@ -10,23 +10,30 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    # 1. Скачиваем ваш код на виртуальную машину
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # 2. ИСПРАВЛЕНО: Правильное имя экшена для настройки Python
     - name: Set up Python
-      uses: actions/actions-setup-python@v5
+      uses: actions/setup-python@v5
       with:
         python-version: '3.13'
 
-    # Запускаем наш build.py (он сам всё установит, синхронизирует и вызовет Inno Setup)
+    # 3. ДОБАВЛЕНО: Установка Inno Setup через пакетный менеджер Windows (winget)
+    # Это добавит ISCC.exe в систему и ваш build.py сможет найти его через стандартные папки
+    - name: Install Inno Setup
+      run: |
+        winget install --id JRSoftware.InnoSetup --silent --accept-source-agreements --accept-package-agreements
+
+    # 4. Запускаем ваш build.py (он сам поставит библиотеки, найдет Inno Setup и всё соберет)
     - name: Run local build script
       run: python build.py
 
-    # Публикуем релиз и забираем собранный установщик
+    # 5. Создаем релиз на GitHub и забираем собранный установщик
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        # Указываем точный путь на основе ваших констант Inno Setup
         files: Output/PolicyTraySwitch_Setup.exe 
         generate_release_notes: true
       env:
