@@ -19,3 +19,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+ADDITIONAL THIRD-PARTY TERMS AND NOTICES
+
+This software integrates the ip-api.com service, which is subject to its own 
+terms of use. The free tier of ip-api.com used by default in this project 
+is strictly for non-commercial use.
+
+If you use, modify, or redistribute this software for any commercial purpose:
+1. You must comply with the ip-api.com Terms of Service.
+2. You must remove the ip-api.com service endpoints from the 
+   "my_ip_tray_endpoints.json" file to prevent unauthorized commercial API requests.
+
