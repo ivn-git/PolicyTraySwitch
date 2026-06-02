@@ -1,0 +1,33 @@
+name: Automated Windows Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/actions-setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # Запускаем наш build.py (он сам всё установит, синхронизирует и вызовет Inno Setup)
+    - name: Run local build script
+      run: python build.py
+
+    # Публикуем релиз и забираем собранный установщик
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        # Указываем точный путь на основе ваших констант Inno Setup
+        files: Output/PolicyTraySwitch_Setup.exe 
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
