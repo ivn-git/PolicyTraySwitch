@@ -28,6 +28,8 @@ jobs:
 
     # 4. Запускаем ваш build.py (он сам поставит библиотеки, найдет Inno Setup и всё соберет)
     - name: Run local build script
+      env:
+        PYTHONUTF8: 1
       run: python build.py
 
     # 5. Создаем релиз на GitHub и забираем собранный установщик
