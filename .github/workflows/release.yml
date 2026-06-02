@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/actions-setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.13'
 
     # Запускаем наш build.py (он сам всё установит, синхронизирует и вызовет Inno Setup)
     - name: Run local build script
