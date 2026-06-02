@@ -25,7 +25,12 @@ jobs:
     - name: Install Inno Setup
       run: |
         winget install --id JRSoftware.InnoSetup --silent --accept-source-agreements --accept-package-agreements
-
+    # ДОБАВЛЕНО: Принудительная системная регистрация pywin32 на сервере Windows
+    - name: Install and Register pywin32 System Components
+      run: |
+        python -m pip install pywin32
+        $python_dir = (Get-Command python).Source | Split-Path
+        python "$python_dir\Scripts\pywin32_postinstall.py" -install
     # 4. Запускаем ваш build.py (он сам поставит библиотеки, найдет Inno Setup и всё соберет)
     - name: Run local build script
       env:
