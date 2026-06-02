@@ -3,4 +3,3 @@ WMI
 Pillow
 pystray
 pyinstaller
-pywin32
