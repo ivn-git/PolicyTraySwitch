@@ -1,6 +1,7 @@
 # PolicyTraySwitch
 
-[![Automated Windows Build & Release](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/build.yml/badge.svg)](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/build.yml)
+[![Automated Windows Build & Release](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/release.yml/badge.svg)](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/release.yml)
+(https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/build.yml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/ivn-git/PolicyTraySwitch?color=blue)](https://github.com/ivn-git/PolicyTraySwitch/releases/latest)
 [![Language](https://img.shields.io/badge/Language-Python-blue)](https://github.com/ivn-git/PolicyTraySwitch)
 
