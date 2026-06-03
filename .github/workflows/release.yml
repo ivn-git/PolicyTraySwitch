@@ -10,36 +10,50 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+      security-events: write 
 
     steps:
     # 1. Скачиваем ваш код на виртуальную машину
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2. ИСПРАВЛЕНО: Правильное имя экшена для настройки Python
+    # 2. Инициализация сканера CodeQL перед сборкой
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: 'python'
+
+    # 3. Настройка Python
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.13'
 
-    # 3. ДОБАВЛЕНО: Установка Inno Setup через пакетный менеджер Windows (winget)
-    # Это добавит ISCC.exe в систему и ваш build.py сможет найти его через стандартные папки
+    # 4. Установка Inno Setup через winget
     - name: Install Inno Setup
       run: |
         winget install --id JRSoftware.InnoSetup --silent --accept-source-agreements --accept-package-agreements
-    # ДОБАВЛЕНО: Принудительная системная регистрация pywin32 на сервере Windows
+
+    # 5. Системная регистрация pywin32
     - name: Install and Register pywin32 System Components
       run: |
         python -m pip install pywin32
         $python_dir = (Get-Command python).Source | Split-Path
         python "$python_dir\Scripts\pywin32_postinstall.py" -install
-    # 4. Запускаем ваш build.py (он сам поставит библиотеки, найдет Inno Setup и всё соберет)
+
+    # 6. Выполнение анализа безопасности (сканирование кода)
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:python"
+
+    # 7. Запуск скрипта сборки build.py
     - name: Run local build script
       env:
         PYTHONUTF8: 1
       run: python build.py
 
-    # 5. Создаем релиз на GitHub и забираем собранный установщик
+    # 8. Создаем релиз на GitHub
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
