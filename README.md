@@ -1,8 +1,8 @@
 # PolicyTraySwitch
 
-[![Automated Windows Build & Release](https://github.com)](https://github.com)
-[![GitHub release (latest by date)](https://shields.io)](https://github.com)
-[![Language](https://shields.io)](https://github.com)
+[![Automated Windows Build & Release](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/build.yml/badge.svg)](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/build.yml)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/ivn-git/PolicyTraySwitch?color=blue)](https://github.com/ivn-git/PolicyTraySwitch/releases/latest)
+[![Language](https://img.shields.io/badge/Language-Python-blue)](https://github.com/ivn-git/PolicyTraySwitch)
 
 Удобный инструмент для быстрого переключения политик и управления конфигурациями прямо из системного трея Windows.
 
@@ -29,7 +29,7 @@
 
 ## 🚀 Установка и запуск
 
-1. Перейдите в раздел [Releases](https://github.com).
+1. Перейдите в раздел [Releases](https://github.com/ivn-git/PolicyTraySwitch/releases/latest).
 2. Скачайте последний доступный файл `PolicyTraySwitch_Setup.exe`.
 3. Запустите установщик и следуйте инструкциям на экране.
 
