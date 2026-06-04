@@ -53,12 +53,18 @@ jobs:
       env:
         PYTHONUTF8: 1
       run: python build.py
-
+    # 7.5. ДОБАВЛЕНО: Упаковка портативной версии в ZIP-архив
+    # Используем встроенный PowerShell на Windows-сервере
+    - name: Archive Portable Version
+      run: |
+        Compress-Archive -Path dist/PolicyTraySwitch -DestinationPath Output/PolicyTraySwitch_Portable.zip
     # 8. Создаем релиз на GitHub
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        files: Output/PolicyTraySwitch_Setup.exe 
+        files: |
+          Output/PolicyTraySwitch_Setup.exe
+          Output/PolicyTraySwitch_Portable.zip
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
