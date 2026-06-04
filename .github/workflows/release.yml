@@ -64,7 +64,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          Output/ PolicyTraySwitch_Setup.exe
+          Output/PolicyTraySwitch_Setup.exe
           Output/PolicyTraySwitch_portable.zip
         generate_release_notes: true
       env:
