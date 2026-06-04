@@ -57,7 +57,7 @@ jobs:
     # Используем встроенный PowerShell на Windows-сервере
     - name: Archive Portable Version
       run: |
-        Compress-Archive -Path dist/PolicyTraySwitch -DestinationPath Output/PolicyTraySwitch_portable.zip
+        Compress-Archive -Path dist/PolicyTraySwitch -DestinationPath Output/PolicyTraySwitchPortable.zip
 
     # 8. Создаем релиз на GitHub
     - name: Create GitHub Release
@@ -65,7 +65,7 @@ jobs:
       with:
         files: |
           Output/PolicyTraySwitch_Setup.exe
-          Output/PolicyTraySwitch_portable.zip
+          Output/PolicyTraySwitchPortable.zip
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
