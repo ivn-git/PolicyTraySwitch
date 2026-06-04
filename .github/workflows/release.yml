@@ -57,11 +57,7 @@ jobs:
     # Используем встроенный PowerShell на Windows-сервере
     - name: Archive Portable Version
       run: |
-        Compress-Archive -Path dist/PolicyTraySwitch -DestinationPath Output/PolicyTraySwitch_Portable.zip
-    # Переименовываем инсталлятор, добавляя пробел в начале имени
-    - name: Rename Installer Asset
-      run: |
-        Rename-Item -Path Output/PolicyTraySwitch_Setup.exe -NewName " PolicyTraySwitch_Setup.exe"
+        Compress-Archive -Path dist/PolicyTraySwitch -DestinationPath Output/PolicyTraySwitch_portable.zip
 
     # 8. Создаем релиз на GitHub
     - name: Create GitHub Release
@@ -69,7 +65,7 @@ jobs:
       with:
         files: |
           Output/ PolicyTraySwitch_Setup.exe
-          Output/PolicyTraySwitch_Portable.zip
+          Output/PolicyTraySwitch_portable.zip
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
