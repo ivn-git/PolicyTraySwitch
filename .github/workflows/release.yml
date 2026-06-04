@@ -58,6 +58,11 @@ jobs:
     - name: Archive Portable Version
       run: |
         Compress-Archive -Path dist/PolicyTraySwitch -DestinationPath Output/PolicyTraySwitch_Portable.zip
+    # Переименовываем инсталлятор, добавляя пробел в начале имени
+    - name: Rename Installer Asset
+      run: |
+        Rename-Item -Path Output/PolicyTraySwitch_Setup.exe -NewName " PolicyTraySwitch_Setup.exe"
+
     # 8. Создаем релиз на GitHub
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
