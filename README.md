@@ -6,7 +6,9 @@
 
 Удобный инструмент для быстрого переключения политик и управления конфигурациями прямо из системного трея (Панели задач) Windows.
 
-<img src="images/Tray.png" alt="Панель задач" width="400"> <img src="images/TrayMenu.png" alt="Меню" width="400"> <img src="images/Tray_IP_Mon.png" alt="IP Монитор" width="400">
+<img src="images/Tray.png" alt="Панель задач" width="400"> 
+<img src="images/TrayMenu.png" alt="Меню" width="400"> 
+<img src="images/Tray_IP_Mon.png" alt="IP Монитор" width="400">
 
 ---
 
