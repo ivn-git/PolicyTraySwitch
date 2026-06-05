@@ -4,7 +4,7 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/ivn-git/PolicyTraySwitch?color=blue)](https://github.com/ivn-git/PolicyTraySwitch/releases/latest)
 [![Language](https://img.shields.io/badge/Language-Python-blue)](https://github.com/ivn-git/PolicyTraySwitch)
 
-Удобный инструмент для быстрого переключения выбранных политик доступа для подключенного к роутеру ПК прямо из системного трея (Панели задач) Windows. В приложении также имеется возможность мониторинга внешнего IP-адреса
+Удобный инструмент для быстрого переключения выбранных политик доступа для подключенного к роутеру ПК прямо из системного трея (Панели задач) Windows. В приложении также предусмотрена возможность мониторинга внешнего IP-адреса и состояния подключения (link) самого верхнего активного интерфейса политики доступа.
 
 <img src="images/Tray.png" alt="Панель задач" width="400"> 
 <img src="images/TrayMenu.png" alt="Меню" width="400"> 
