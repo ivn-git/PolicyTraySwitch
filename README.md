@@ -1,4 +1,4 @@
-# PolicyTraySwitch
+# Policy Tray Switch Application for Keenetic/Netcraze Router
 
 [![Automated Windows Build & Release](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/release.yml/badge.svg)](https://github.com/ivn-git/PolicyTraySwitch/actions/workflows/release.yml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/ivn-git/PolicyTraySwitch?color=blue)](https://github.com/ivn-git/PolicyTraySwitch/releases/latest)
