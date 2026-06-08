@@ -303,6 +303,8 @@ class SettingsGUI:
             anchor="w"
         )
         self.notification_label.pack(side=tk.LEFT, fill=tk.X, expand=True) 
+        self.sb = SB(self.notification_label) 
+        # Правый лейбл для отображения текущего IP-адреса активного сетевого интерфейса 
         self.right_label = tk.Label(
             statusbar_frame, 
             text=f"IP: {self.curr_dev_ip if self.curr_dev_ip else 'N/A'}", 
@@ -311,7 +313,15 @@ class SettingsGUI:
             anchor="e"
         )
         self.right_label.pack(side=tk.RIGHT, padx=5)
-        self.sb = SB(self.notification_label)   
+        ToolTip(self.right_label, "Текущий IP-адрес активного сетевого интерфейса \n Кликните для обновления", posY=-40, posX=-180)
+        def update_ip_status(event):
+            self.right_label.config(text="Обновление...")
+            self.curr_dev_ip, mac, gateway = get_current_interface_details()
+            new_text = f"IP: {self.curr_dev_ip if self.curr_dev_ip else 'N/A'}"
+            self.right_label.config(text=new_text)
+        
+        # Привязываем вложенную функцию к событию клика
+        self.right_label.bind("<Button-1>", update_ip_status)        
 
 #================== GENERAL TAB ===============================    
     def setup_general_tab(self, notebook):
