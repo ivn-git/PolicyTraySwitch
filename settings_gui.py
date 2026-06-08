@@ -292,14 +292,25 @@ class SettingsGUI:
         close_btn.pack(side=tk.LEFT, padx=5)
 
         # Статус-бар для уведомлений
+        # Общий контейнер для статус-бара (заменяет старое размещение на дне окна)
+        statusbar_frame = tk.Frame(self.root)
+        statusbar_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.notification_label = tk.Label(
-            self.root, 
+            statusbar_frame, 
             text="Ожидание подключения...", 
             fg="grey", 
             font=("Arial", 10),
             anchor="w"
         )
-        self.notification_label.pack(side=tk.BOTTOM,fill=tk.X) 
+        self.notification_label.pack(side=tk.LEFT, fill=tk.X, expand=True) 
+        self.right_label = tk.Label(
+            statusbar_frame, 
+            text=f"IP: {self.curr_dev_ip if self.curr_dev_ip else 'N/A'}", 
+            fg="grey", 
+            font=("Arial", 10),
+            anchor="e"
+        )
+        self.right_label.pack(side=tk.RIGHT, padx=5)
         self.sb = SB(self.notification_label)   
 
 #================== GENERAL TAB ===============================    
