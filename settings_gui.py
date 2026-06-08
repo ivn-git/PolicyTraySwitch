@@ -11,6 +11,19 @@ from pathlib import Path
 from build import CONFIG_FILE, APP_NAME, APP_NAME_LONG, APP_ICON_DIR, APP_ICON, \
                       LOG_FILE, LOG_LEVEL_DEF, LOG_FORMAT, LOG_NOISY_LIBRARES, LOG_BACKUP_COUNT, LOG_FILE_MAX_BYTES
 
+import re
+import threading
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+import copy
+from typing import Any
+
+import requests
+import wmi
+from PIL import Image, ImageTk 
+import winreg
+
 ############################ Утилиты для работы с файлами, путями ##################################
 # Корневая папка приложения (Внешняя папка, где лежит .exe или главный .py скрипт)
 # Проверяем, что это ИМЕННО PyInstaller и ресурсы ИМЕННО распакованы
@@ -43,8 +56,57 @@ def is_onedir_build():
         # Если папка с EXE совпадает с папкой ресурсов _MEIPASS — это onedir
         return os.path.normpath(sys._MEIPASS) == os.path.normpath(exe_dir)
     return False
-####################################################################################################
+############################## Функции для работы с сетью ###############################################
+def get_current_interface_details():
+    """
+    Находит самый приоритетный активный интерфейс 
+    и возвращает строго связанные между собой (IP, MAC, Gateway).
+    """
+    c = wmi.WMI()
+    interfaces = c.Win32_NetworkAdapterConfiguration(IPEnabled=True)
+    
+    blacklist = ('virtual', 'vpn', 'tap', 'host-only', 'vbox', 'vmware', 'hyper-v', 'pseudo')
+    valid_interfaces = []
 
+    for interface in interfaces:
+        desc = interface.Description.lower() if interface.Description else ""
+        
+        if any(word in desc for word in blacklist):
+            log.debug(f"Пропущен виртуальный интерфейс: {interface.Description}")
+            continue
+            
+        if interface.DefaultIPGateway:
+            # Получаем метрику шлюза (GatewayCostMetric может быть списком, берем первый элемент)
+            try:
+                metric = int(interface.GatewayCostMetric[0]) if interface.GatewayCostMetric else 9999
+            except (IndexError, ValueError, TypeError):
+                metric = 9999
+            
+            valid_interfaces.append((metric, interface))
+            
+    if not valid_interfaces:
+        log.debug("Не найдено подходящих физических интерфейсов с активным шлюзом.")
+        return None, None, None  # Ничего не найдено
+
+    # Сортируем: на самом верху окажется адаптер с наименьшей метрикой
+    valid_interfaces.sort(key=lambda x: x[0])
+    best_metric, best_interface = valid_interfaces[0]
+    log.debug(f"Найден активный интерфейс: {best_interface.Description}")
+    # 1. Извлекаем строго IPv4 адрес победившего адаптера
+    target_ip = None
+    for ip in best_interface.IPAddress:
+        if ':' not in ip:
+            target_ip = ip
+            break
+            
+    # 2. Извлекаем MAC-адрес именно этого адаптера
+    target_mac = best_interface.MACAddress.lower() if best_interface.MACAddress else None
+    
+    # 3. Извлекаем шлюз именно этого адаптера
+    target_gateway = best_interface.DefaultIPGateway[0] if best_interface.DefaultIPGateway else None
+
+    return target_ip, target_mac, target_gateway
+################################### Kонфигурация логирования ########################################
 class LoggerAdapter_ex(logging.LoggerAdapter):
     def process(self, msg, kwargs):
         base_extra = self.extra if self.extra is not None else {}
@@ -94,21 +156,7 @@ def setup_log():
 
 log = setup_log()
 
-
-
-import re
-import threading
-import tkinter as tk
-from tkinter import ttk, messagebox
-
-import copy
-from typing import Any
-
-import requests
-import wmi
-from PIL import Image, ImageTk 
-import winreg
-
+################################ Основной класс приложения и функции для работы с конфигурацией ################################
 
 DEF_GEOMETRY = "1000x600+100+100"
 
@@ -148,33 +196,8 @@ class SettingsGUI:
     
     def load_config(self):
         """Загружает конфигурацию из файла"""
-        def get_first_active_interface():
-            """Функция ищет ПЕРВЫЙ физический интерфейс со шлюзом, игнорируя виртуальные адаптеры"""
-            c = wmi.WMI()
-            interfaces = c.Win32_NetworkAdapterConfiguration(IPEnabled=True)
-            
-            # Список слов-маркеров виртуальных или VPN интерфейсов (в нижнем регистре)
-            blacklist = ('virtual', 'vpn', 'tap', 'host-only', 'vbox', 'vmware', 'hyper-v')
-            # Пытаемся получить первый активный (не виртуальный) и имеющий шлюз интерфейс на компьютере 
-            for interface in interfaces:
-                # 1. Приводим описание к нижнему регистру для надежности проверки
-                desc = interface.Description.lower() if interface.Description else ""
-                
-                # 2. Проверяем, содержит ли описание хотя бы одно слово указывающее на его виртуальность
-                if any(word in desc for word in blacklist):
-                    log.debug(f"Пропущен виртуальный интерфейс: {interface.Description}")
-                    continue  # Переходим к следующему, не проверяя шлюз
-                    
-                # 3. Если это не виртуальный адаптер, проверяем наличие шлюза
-                if interface.DefaultIPGateway:
-                    mac = interface.MACAddress.lower() if interface.MACAddress else None
-                    gateway = interface.DefaultIPGateway[0]
-                    
-                    log.debug(f"Найден активный физический интерфейс: MAC={mac}, Gateway={gateway}")
-                    return mac, gateway
-                    
-            log.debug("Не найдено подходящих физических интерфейсов с активным шлюзом.")
-            return None, None
+        # Пробуем получить адрес роутера и mac и IP сетевой карты из активного сетевого интерфейса
+        self.curr_dev_ip, mac, gateway = get_current_interface_details()
 
         if os.path.exists(self.config_file):
             try:
@@ -182,6 +205,10 @@ class SettingsGUI:
                     config_json=json.load(f)
                     self.switches = copy.deepcopy(config_json.get("switches", []))
                     self.mark_changed(value=False)
+                    if config_json.get("device_mac") != mac and mac is not None:
+                        if  messagebox.askyesno("Внимание", "MAC-адрес в конфигурации не совпадает с текущим MAC-адресом активного сетевого интерфейса. \n"\
+                                f"Хотите обновить MAC-адрес в конфигурации на текущий {mac}? \n"):
+                            config_json["device_mac"] = mac
                     return config_json
             except Exception as e:
                 messagebox.showerror("Ошибка", f"Не удалось загрузить конфигурацию: {e}")
@@ -203,8 +230,7 @@ class SettingsGUI:
                         "name": "Policy2"
                     }
                 ]
-            # Пробуем получить адрес роутера и mac сетевой карты из активного сетевого интерфейса
-            mac, gateway = get_first_active_interface()
+
             self.mark_changed()            
             return {
                 "router_url": f"http://{gateway}:81" if gateway else "http://192.168.1.1:81",
