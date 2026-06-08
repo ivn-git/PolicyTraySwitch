@@ -6,3 +6,4 @@ config.json
 *.egg-info/
 *.pyc
 *.log
+*test*.py
