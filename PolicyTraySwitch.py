@@ -592,16 +592,26 @@ class VPNTrayApp:
         def open_gui_thread():
             # Создаем главное окно           
             self.settings_root = tk.Tk()
-            
+            # Флаг отслеживания изменений
+            self.settings_root.conf_has_changes = False
+
             def on_widget_destroy(event):
                 if event.widget == self.settings_root:
+                    nonlocal conf_changed
+                    conf_changed = getattr(self.settings_root, 'conf_has_changes', False)                    
                     self.settings_root = None
+            # Локальная переменная для сохранения статуса после закрытия
+            conf_changed = False
 
             self.settings_root.bind("<Destroy>", on_widget_destroy)
             SettingsGUI(self.settings_root, self.config_file)
             self.settings_root.after(100, self.check_queue, self.settings_root)
             self.settings_root.mainloop()
 
+            if not conf_changed:
+                log.debug("Настройки были открыты, но изменений не было. Не перезагружаем конфигурацию.")
+                return  # Изменений не было, прерываем выполнение
+            log.debug("Настройки были изменены, перезагружаем конфигурацию и обновляем интерфейс...")
             # После закрытия GUI перезагружаем конфиг
             self.config = self.load_config(self.config_file)
 

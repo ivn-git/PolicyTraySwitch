@@ -260,6 +260,7 @@ class SettingsGUI:
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(self.config, f, indent=4, ensure_ascii=False)
             self.mark_changed(value=False)
+            self.root.conf_has_changes = True
             messagebox.showinfo("Успех", "Конфигурация сохранена успешно!")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось сохранить конфигурацию: {e}")
