@@ -578,13 +578,29 @@ class VPNTrayApp:
     def on_open_settings_gui(self, icon=None, item=None):
         """Открывает окно настроек в отдельном потоке"""
         from settings_gui import SettingsGUI  # Импортируем здесь, чтобы не было проблем при отсутствии GUI
+        import tkinter as tk
+        # 1. Проверяем, существует ли уже окно настроек
+        if hasattr(self, 'settings_root') and self.settings_root is not None:
+            try:
+                self.settings_root.deiconify()
+                self.settings_root.lift()
+                self.settings_root.focus_force()
+                return  # Окно уже открыто, выходим
+            except tk.TclError:
+                self.settings_root = None
+
         def open_gui_thread():
-            # Создаем главное окно
-            import tkinter as tk
-            root = tk.Tk()
-            SettingsGUI(root, self.config_file)
-            root.after(100, self.check_queue, root)
-            root.mainloop()
+            # Создаем главное окно           
+            self.settings_root = tk.Tk()
+            
+            def on_widget_destroy(event):
+                if event.widget == self.settings_root:
+                    self.settings_root = None
+
+            self.settings_root.bind("<Destroy>", on_widget_destroy)
+            SettingsGUI(self.settings_root, self.config_file)
+            self.settings_root.after(100, self.check_queue, self.settings_root)
+            self.settings_root.mainloop()
 
             # После закрытия GUI перезагружаем конфиг
             self.config = self.load_config(self.config_file)
