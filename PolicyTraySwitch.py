@@ -481,6 +481,8 @@ class VPNTrayApp:
             if self._current_state not in ["turning_on", "turning_off"]:
                 if self.current_state == "initializing":
                     start_time = time.time()
+                old_interface_name = self.current_interface_name
+                old_interface_link = self.current_interface_link
                 new_state, msg = self.get_switch_state_from_router()
                 if self.current_state == "initializing" and time.time() - start_time < 5:
                     time.sleep(5 - (time.time() - start_time))               
@@ -493,6 +495,9 @@ class VPNTrayApp:
                             log.debug(f"Состояние обновлено: {switch_name} ВКЛЮЧЕН")
                         elif new_state == "off":
                             log.debug(f"Состояние обновлено: {switch_name} ВЫКЛЮЧЕН")
+                    else:
+                        if old_interface_name != self.current_interface_name or old_interface_link != self.current_interface_link:
+                            self.update_icon_state()
                 else:
                     # Роутер или политика недоступна
                     log.error(f"Ошибка: {str(msg)}")
