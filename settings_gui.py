@@ -1012,12 +1012,11 @@ class SettingsGUI:
                             {
                                 "id": item["id"], 
                                 "name": item["name"],
-                                "enabled": item.get("enabled", True) 
-                            } for item in self.switches
+                                "enabled": True 
+                            } for item in self.switches if item.get("enabled", True)
                         ]
 
-
-                self.has_unsaved_changes[key] = self.config.get(key, []) != switches
+                self.has_unsaved_changes[key] = [item for item in self.config.get(key, []) if item.get("enabled", True)] != switches
             else:
                 self.has_unsaved_changes[key] = value
         # 3. Полный сброс всех флагов (Вызывается как self.mark_changed(value=False) после сохранения)
