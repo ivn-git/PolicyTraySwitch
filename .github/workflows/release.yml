@@ -67,5 +67,14 @@ jobs:
           Output/PolicyTraySwitch_Portable.zip
           Output/PolicyTraySwitch_Setup.exe       
         generate_release_notes: true
+        body: |
+          ### 📦 Доступные сборки
+
+          | Файл | Описание |
+          | --- | --- |
+          | 💿 [**PolicyTraySwitch_Setup.exe**](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/PolicyTraySwitch_Setup.exe) | Установщик для Windows |
+          | 🗜️ [**PolicyTraySwitch_Portable.zip**](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/PolicyTraySwitch_Portable.zip) | Портативная версия (не требует установки) |
+
+          ---
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
