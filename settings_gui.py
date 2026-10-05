@@ -52,9 +52,10 @@ def get_data_path(*paths):
 def is_onedir_build():
     """Проверяет, что приложение скомпилировано именно в режиме --onedir"""
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        exe_dir = os.path.dirname(sys.executable)
-        # Если папка с EXE совпадает с папкой ресурсов _MEIPASS — это onedir
-        return os.path.normpath(sys._MEIPASS) == os.path.normpath(exe_dir)
+        exe_dir = os.path.normpath(os.path.dirname(sys.executable)).lower()
+        meipass = os.path.normpath(sys._MEIPASS).lower()       
+        meipass_parent = os.path.dirname(meipass)
+        return exe_dir == meipass or exe_dir == meipass_parent
     return False
 ############################## Функции для работы с сетью ###############################################
 def get_current_interface_details():
