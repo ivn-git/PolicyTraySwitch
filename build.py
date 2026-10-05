@@ -4,6 +4,7 @@ import sys
 import subprocess
 import importlib
 import site
+import sysconfig
 
 
 APP_NAME = 'PolicyTraySwitch'
@@ -74,17 +75,23 @@ def check_and_install_dependencies():
         print(f"[ Критическая ошибка ] Не удалось установить библиотеки: {e}")
         sys.exit(1)
 
-    # 4. Исправление путей среды (Магия для Microsoft Store)
-    user_site_paths = []
+    # 4. Исправление путей среды для pywin32
+    site_paths = []
+    if hasattr(site, 'getsitepackages'):
+        site_paths.extend(site.getsitepackages())
     if hasattr(site, 'getusersitepackages'):
-        user_site_paths.append(site.getusersitepackages())
-    user_site_paths.append(os.path.join(os.environ.get('APPDATA', ''), 'Python', 'Python313', 'site-packages'))
-    
-    for site_path in user_site_paths:
-        if site_path and site_path not in sys.path:
+        site_paths.append(site.getusersitepackages())
+    purelib_path = sysconfig.get_paths().get('purelib')
+    if purelib_path:
+        site_paths.append(purelib_path)
+
+    for site_path in dict.fromkeys(path for path in site_paths if path):
+        if os.path.isdir(site_path) and site_path not in sys.path:
             sys.path.append(site_path)
-            
-        # Исправление путей к DLL для pywin32
+
+        if os.name != 'nt':
+            continue
+
         pywin32_path = os.path.join(site_path, 'win32')
         pywin32_lib = os.path.join(site_path, 'win32', 'lib')
         pywin32_system32 = os.path.join(site_path, 'pywin32_system32')
@@ -97,10 +104,7 @@ def check_and_install_dependencies():
         if os.path.exists(pywin32_system32):
             os.environ['PATH'] = pywin32_system32 + os.path.pathsep + os.environ.get('PATH', '')
             if hasattr(os, 'add_dll_directory'):
-                try:
-                    os.add_dll_directory(pywin32_system32)
-                except Exception:
-                    pass
+                os.add_dll_directory(pywin32_system32)
 
     importlib.invalidate_caches()
 
