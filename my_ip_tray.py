@@ -5,6 +5,7 @@ import sys
 import time
 import threading
 import io
+from collections import defaultdict
 import requests
 import ctypes
 from PIL import Image
@@ -49,6 +50,40 @@ def load_config(endpoints_file=IP_TRAY_ENDPOINTS):
 
 CONFIG = load_config()
 
+_MISSING = object()
+
+def get_value(data, path, default=""):
+    """Читает поле из ответа: корневой ключ или вложенный путь.
+
+    Примеры path:
+      "ipAddress"                            # как раньше, корневой ключ
+      "country.iso_code"                     # вложенный словарь
+      "subdivisions.0.names.en"              # элемент списка по индексу
+      "country.names.ru|country.names.en"    # fallback через |
+      ["country.names.ru", "country.names.en"]  # fallback списком
+    """
+    if isinstance(path, str):
+        paths = [p.strip() for p in path.split("|") if p.strip()]
+    else:
+        paths = list(path or [])
+
+    for p in paths:
+        cur = data
+        for part in str(p).split("."):
+            if isinstance(cur, dict):
+                cur = cur.get(part, _MISSING)
+            elif isinstance(cur, (list, tuple)) and part.lstrip("-").isdigit():
+                idx = int(part)
+                cur = cur[idx] if -len(cur) <= idx < len(cur) else _MISSING
+            else:
+                cur = _MISSING
+            if cur is _MISSING or cur is None:
+                break
+        if (cur is not _MISSING and cur is not None
+                and not isinstance(cur, (dict, list, tuple))
+                and cur not in (None, "")):
+            return cur
+    return default
 
 # Потокобезопасное хранилище данных приложения
 state = {
@@ -88,15 +123,31 @@ def fetch_ip_info():
                 log.debug(f"Ответ получен от {service["url"]} успешно")
                 data = response.json()
 
-                if data and data.get(service["code_key"]):
+                code = get_value(data, service["code_key"])
+                if data and code:
                     # Запоминаем этот индекс как успешный для следующей итерации через минуту
                     state["current_service_index"] = check_index
-                    fmt_text = service["fmt_string"].format(**{k: data.get(k, "") for k in data})
+
+                    # Основные поля: используются и в трее, и в fmt_string
+                    values = {
+                        "ip": get_value(data, service["ip_key"]),
+                        "code": code,
+                        "country": get_value(data, service["country_key"]),
+                        "region": get_value(data, service["region_key"]),
+                    }
+                    # Необязательные дополнительные поля только для fmt_string
+                    for name, path in service.get("fmt_vars", {}).items():
+                        values[name] = get_value(data, path)
+
+                    # Корневые ключи ответа по-прежнему доступны в fmt_string,
+                    # а отсутствующие плейсхолдеры дают "" вместо KeyError.
+                    fmt_values = defaultdict(str, {**data, **values})
+                    fmt_text = service["fmt_string"].format_map(fmt_values)
                     return {
-                        "ip": data.get(service["ip_key"]),
-                        "code": data.get(service["code_key"]),
-                        "country": data.get(service["country_key"]),
-                        "region": data.get(service["region_key"]),
+                        "ip": values["ip"],
+                        "code": code,
+                        "country": values["country"],
+                        "region": values["region"],
                         "text": fmt_text
                     }
             else:
