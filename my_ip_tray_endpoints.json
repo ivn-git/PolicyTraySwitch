@@ -15,6 +15,33 @@
       "country_key": "country",
       "region_key": "regionName",
       "fmt_string": "IP: {query}\nСтрана: {country}\nРегион: {regionName}\nISP: {isp}\norg: {org}\n\nIP инфо провайдер: ip-api.com"
+    },
+    {
+      "url": "https://curlmyip.ru/geo",
+      "ip_key": "ip",
+      "code_key": "country.iso_code",
+      "country_key": [
+        "country.names.ru",
+        "country.names.en",
+        "country.iso_code"
+      ],
+      "region_key": [
+        "subdivisions.0.names.ru",
+        "subdivisions.0.names.en"
+      ],
+      "fmt_vars": {
+        "city": [
+          "city.names.ru",
+          "city.names.en"
+        ],
+        "continent": [
+          "continent.names.ru",
+          "continent.names.en"
+        ],
+        "asn_org": "autonomous_system_organization",
+        "asn_num": "autonomous_system_number"
+      },
+      "fmt_string": "IP: {ip}\nСтрана: {country} ({code})\nРегион: {region}\nГород: {city}\nКонтинент: {continent}\nASN: AS{asn_num} {asn_org}\n\nIP инфо провайдер: curlmyip.ru"
     }
   ],
   "flag_providers": [
